@@ -447,7 +447,7 @@ describe('PUT /orders/:orderId', () => {
         return resp.json();
       })
       .then((json) => {
-        console.log('450:', json);
+        console.log('450:',typeof json.status);
         expect(json.status).toBe('delivered');
         expect(typeof json.dateProcessed).toBe('string');
       })
@@ -492,12 +492,10 @@ describe('DELETE /orders/:orderId', () => {
           .then((resp) => ({ resp, _id })),
       )
       .then(({ resp, _id }) => {
-        console.log('495:', _id);
         expect(resp.status).toBe(200);
         return fetchAsAdmin(`/orders/${_id}`);
       })
       .then((resp) => {
-        console.log('500:', resp);
         expect(resp.status).toBe(404)})
   ));
 });
