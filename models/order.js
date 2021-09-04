@@ -27,7 +27,10 @@ const orderSchema = new Schema ({
       type: Date,
       default: Date.now
     },
-    dateProcessed: { type: Date }
+    dateProcessed: { 
+      type: Date,
+      default: Date.now
+    }
 })
 
 module.exports = mongoose.model('Order', orderSchema)

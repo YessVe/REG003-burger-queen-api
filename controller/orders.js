@@ -84,11 +84,9 @@ const updateOrder = async (req, resp, next) => {
 // delete
 const deleteOrder = async (req, resp, next) => {
     let orderId = req.params.orderId
-    console.log('90:',orderId);
     try {
         if (!validateParams(orderId)) return next(404)
         const deleted = await Order.findByIdAndDelete(orderId)  
-        console.log(deleted);
         return resp.status(200).send(deleted)
     } catch (err) {
         next(err)
