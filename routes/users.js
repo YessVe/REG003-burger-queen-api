@@ -1,31 +1,39 @@
-const bcrypt = require('bcrypt');
+const { requireAuth, requireAdmin, requireLogin } = require('../middleware/auth');
+const { getUsers, createUsers, getUserByUidOrEmail, updateUser, deleteUser } = require('../controller/users');
+const User = require('../models/user');
 
-const {
-  requireAuth,
-  requireAdmin,
-} = require('../middleware/auth');
-
-const {
-  getUsers,
-} = require('../controller/users');
-
-
-const initAdminUser = (app, next) => {
+const initAdminUser = async (app, next) => {
+  // traigo los datos del administrador que están en el archivo config.js
   const { adminEmail, adminPassword } = app.get('config');
+  // console.log(!adminEmail, adminPassword);
   if (!adminEmail || !adminPassword) {
     return next();
   }
 
-  const adminUser = {
-    email: adminEmail,
-    password: bcrypt.hashSync(adminPassword, 10),
-    roles: { admin: true },
-  };
+  // TO DO: crear usuaria admin
+  try {
+    const findUserByEmail = await User.findOne({ email: adminEmail });
 
-  // TODO: crear usuaria admin
+    if (findUserByEmail) {
+      console.log('This e-mail exists.');
+      return next(200);
+    }
+    // Crear nuevo usuario
+    const user = await new User({
+      email: adminEmail,
+      password: adminPassword,
+      roles: { admin: true },
+    });
+
+    user.password = await User.encryptPassword(user.password);
+
+    user.save();
+  } catch (err) {
+    if (err !== 200) { console.log('There is a database problem'); }
+  }
+
   next();
 };
-
 
 /*
  * Diagrama de flujo de una aplicación y petición en node - express :
@@ -76,8 +84,8 @@ module.exports = (app, next) => {
    * @code {401} si no hay cabecera de autenticación
    * @code {403} si no es ni admin
    */
-  app.get('/users', requireAdmin, getUsers);
-
+  app.get('/users', requireAdmin, requireAdmin, getUsers);
+  // app.get('/users', getUsers);
   /**
    * @name GET /users/:uid
    * @description Obtiene información de una usuaria
@@ -94,8 +102,7 @@ module.exports = (app, next) => {
    * @code {403} si no es ni admin o la misma usuaria
    * @code {404} si la usuaria solicitada no existe
    */
-  app.get('/users/:uid', requireAuth, (req, resp) => {
-  });
+  app.get('/users/:uid', requireAuth, getUserByUidOrEmail);
 
   /**
    * @name POST /users
@@ -116,8 +123,7 @@ module.exports = (app, next) => {
    * @code {401} si no hay cabecera de autenticación
    * @code {403} si ya existe usuaria con ese `email`
    */
-  app.post('/users', requireAdmin, (req, resp, next) => {
-  });
+  app.post('/users', requireAdmin, createUsers);
 
   /**
    * @name PUT /users
@@ -141,8 +147,7 @@ module.exports = (app, next) => {
    * @code {403} una usuaria no admin intenta de modificar sus `roles`
    * @code {404} si la usuaria solicitada no existe
    */
-  app.put('/users/:uid', requireAuth, (req, resp, next) => {
-  });
+  app.put('/users/:uid', requireAuth, updateUser);
 
   /**
    * @name DELETE /users
@@ -160,8 +165,7 @@ module.exports = (app, next) => {
    * @code {403} si no es ni admin o la misma usuaria
    * @code {404} si la usuaria solicitada no existe
    */
-  app.delete('/users/:uid', requireAuth, (req, resp, next) => {
-  });
+  app.delete('/users/:uid', requireAuth, deleteUser);
 
   initAdminUser(app, next);
 };
