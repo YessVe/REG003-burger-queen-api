@@ -152,15 +152,6 @@ Body response:
       }
 ```
 
-* `PUT /users/:uid`
-
-```
-Body request:
-
-Body response:
-
-```
-
 * `DELETE /users/:uid`
 
 ```
@@ -268,14 +259,6 @@ Body response:
       }
 ```
 
-* `PUT /products/:productid`
-
-```
-Body request:
-
-Body response:
-```
-
 * `DELETE /products/:productid`
 
 ```
@@ -285,46 +268,6 @@ Body response:
     }
 ```
 
-> #### 2.1.5 `/orders`
-
-* `GET /orders`
-
-```
-Body response:
-
-```
-
-* `GET /orders/:orderId`
-
-```
-Body request:
-
-Body response:
-```
-
-* `POST /orders`}
-
-```
-Body request:
-
-Body response:
-```
-
-* `PUT /orders/:orderId`
-
-```
-Body request:
-
-Body response:
-```
-
-* `DELETE /orders/:orderId`
-
-```
-Body request:
-
-Body response:
-```
 
 
 ### 2.2 CLI
